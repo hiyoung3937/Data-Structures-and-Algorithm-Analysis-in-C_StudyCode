@@ -2,7 +2,7 @@
 #include <time.h>
 #include "variable.h"//全局变量
 #include "rand_array.h"//引用随机数组
-#include "Max.h"//三者中最大值
+#include "function.h"//函数集合
 
 //#define LENGTH 1000    //生成多大的数组
 
@@ -10,13 +10,14 @@
 int MaxSubsequenceSum_1(const int A[],int N);//O(N^3)
 int MaxSubsequenceSum_2(const int A[],int N);//O(N^2)
 int MaxSubsequenceSum_3(const int A[],int N);//O(NlogN)
+int MaxSubsequenceSum_4(const int A[],int N);//O(N)
 static int MaxSubSum(const int A[],int Left,int Right);//O(NlogN)
 
 int main(void)
 {
     clock_t start_t,end_t;
     double total_t;
-    
+/*    
     start_t = clock();
     printf("O(N^3): %d\n",MaxSubsequenceSum_1(rand_array(),LENGTH));
     end_t = clock();
@@ -26,9 +27,14 @@ int main(void)
     printf("O(N^2): %d\n",MaxSubsequenceSum_2(rand_array(),LENGTH));
     end_t = clock();
     printf("CPU占用时间: %f\n",total_t = (double)(end_t - start_t) / CLOCKS_PER_SEC);
-
+*/
     start_t = clock();
     printf("O(NlogN): %d\n",MaxSubsequenceSum_3(rand_array(),LENGTH));
+    end_t = clock();
+    printf("CPU占用时间: %f\n",total_t = (double)(end_t - start_t) / CLOCKS_PER_SEC);
+
+    start_t = clock();
+    printf("O(N): %d\n",MaxSubsequenceSum_4(rand_array(),LENGTH));
     end_t = clock();
     printf("CPU占用时间: %f\n",total_t = (double)(end_t - start_t) / CLOCKS_PER_SEC);
 
@@ -118,6 +124,22 @@ static int MaxSubSum(const int A[],int Left,int Right)
 
     return Max(MaxLeftSum, MaxRightSum, MaxLeftBorderSum+MaxRightBorderSum);
 
-
 }
 
+int MaxSubsequenceSum_4(const int A[],int N)
+{
+    int ThisSum, MaxSum, j;
+    ThisSum=MaxSum=0;
+
+    for(j=0; j<N; j++)
+    {
+        ThisSum += A[j];
+
+        if(ThisSum > MaxSum)
+            MaxSum = ThisSum;
+        else if(ThisSum < 0)
+            ThisSum = 0;
+    }
+
+    return MaxSum;
+}
