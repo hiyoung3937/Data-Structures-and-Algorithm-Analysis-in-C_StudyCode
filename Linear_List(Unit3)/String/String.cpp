@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 
 #define MAXSIZE 100
 
@@ -127,7 +128,6 @@ int StrSub(Str &substr , Str str, int pos, int len)
     }
 }
 
-
 //清空串
 int StrClear(Str &str)
 {
@@ -141,7 +141,6 @@ int StrClear(Str &str)
     return 1;
 }
 
-
 //打印字符串内容
 int StrPrint(Str str)
 {
@@ -154,22 +153,146 @@ int StrPrint(Str str)
     return 1;
 }
 
+//简单模式匹配子串
+int StrBF(Str str, Str substr)
+{
+    int i = 0, j = 0, k = i;//串从数组下标0开始
+
+    while (i < str.length && j < substr.length)
+    {
+        if(str.ch[i] == substr.ch[j])
+        {
+            ++i; 
+            ++j;
+        }
+        else
+        {
+            j = 0; //匹配失败，子串重置到开头
+            i = ++k; //匹配失败，i从子串的下一个位置开始，k记录了上一次的起始位置
+        }
+
+    }
+    //跳出循环有两种可能，i == str.length说明已经遍历完主串，匹配失败；
+    //j == substr.length,说明子串遍历完成，在主串中成功匹配
+    if(j == substr.length)
+        return k;
+    else 
+        return 0;
+}
+
+//KMP算法匹配子串(假设串从数组下标1位置开始存储,有BUG)
+
+//获取NEXT数组(假设串从数组下标1位置开始存储)
+void Strnext(Str substr, int *next)
+{
+    int i=1, j=0;   //串从数组下标1位置开始存储，i初值设为1
+    next[1] = 0;    //特殊情况，模式串的第一个字符与主串不匹配，赋值为0来表示
+
+    while (i < substr.length)
+    {
+        if(j == 0 || substr.ch[i] == substr.ch[j])
+        {
+            ++i;
+            ++j;
+            next[i] = j;
+        }
+        else
+            j = next[j];
+    }
+}
+
+//KMP算法
+int StrKMP(Str str, Str substr)
+{
+    int next[20];
+    Strnext(substr, next);
+
+    int i = 1, j = 1; //串从数组下标1位置开始存储
+    while (i <= str.length && j <= substr.length)
+    {
+        if( j == 0 || str.ch[i] == substr.ch[j])    
+        {
+            ++i;
+            ++j;
+        }
+        else
+            j = next[j];
+    }
+    
+    if( j > substr.length)
+        return i - substr.length;
+    else
+        return 0;
+}
+
+//KMP算法匹配子串(假设串从数组下标1位置开始存储,无BUG)
+void Next(char *str,int *next)
+{
+    int i=1;
+    next[1]=0;
+    int j=0;
+    while (i<strlen(str)) 
+    {
+        if (j==0||str[i-1]==str[j-1]) 
+        {
+            i++;
+            j++;
+            next[i]=j;
+        }else
+        {
+            j=next[j];
+        }
+    }
+}
+int KMP(char *str,char *substr)
+{
+    int next[10];
+    Next(substr,next);//根据模式串T,初始化next数组
+    int i=1;
+    int j=1;
+
+    while (i<=strlen(str)&&j<=strlen(substr)) 
+    {
+        //j==0:代表模式串的第一个字符就和当前测试的字符不相等；str[i-1]==substr[j-1],
+        //如果对应位置字符相等，两种情况下，指向当前测试的两个指针下标i和j都向后移
+        if (j==0 || str[i-1]==substr[j-1]) 
+        {
+            i++;
+            j++;
+        }
+        else
+        {
+            j=next[j];//如果测试的两个字符不相等，i不动，j变为当前测试字符串的next值
+        }
+    }
+    if (j>strlen(substr)) //如果条件为真，说明匹配成功
+    {
+        return i-(int)strlen(substr);
+    }
+    return -1;
+}
+
 
 int main(void)
 {
     Str str, str1, str2, substr; 
     int pos = 0;
     int len = 5;
+
     str.ch = NULL;
     str1.ch = NULL;
     str2.ch = NULL;
     substr.ch = NULL;
 
-    char s1[MAXSIZE] = "hello world,";
-    char s2[MAXSIZE] = "hello world!";
-    
+    char s1[MAXSIZE] = "ababcabcacbab";
+    char s2[MAXSIZE] = "abcac";
+
     Strassign(str1, s1);
     Strassign(str2, s2);
+
+   
+    printf("%d\n", StrBF(str1, str2));
+    printf("%d\n", KMP(s1,s2));
 
     StrConcat(str,str1,str2);
 
