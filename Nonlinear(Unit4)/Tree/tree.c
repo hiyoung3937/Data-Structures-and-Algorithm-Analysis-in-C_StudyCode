@@ -9,13 +9,19 @@ int main(void)
 	binarytree_create(&root);
 
 	printf("\r\n先序遍历二叉树:");
-	binarytree_preorder(root);
-
+	binarytree_preorder(root);	//递归
+	printf("\r\n非递归先序遍历二叉树:");
+	preorder_NonRecursion(root);	//非递归
+	
 	printf("\r\n中序遍历二叉树:");
 	binarytree_inorder(root);
+	printf("\r\n非递归中序遍历二叉树:");
+	inorder_NonRecursion(root);
 
 	printf("\r\n后序遍历二叉树:");
 	binarytree_postorder(root);
+	printf("\r\n非递归后序遍历二叉树:");
+	postorder__NonRecursion(root);
 
     //未实现
 	// printf("\r\n层次遍历二叉树:");
